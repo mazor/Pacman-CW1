@@ -1,0 +1,163 @@
+# partialAgent.py
+# parsons/15-oct-2017
+#
+# Version 1
+#
+# The starting point for CW1.
+#
+# Intended to work with the PacMan AI projects from:
+#
+# http://ai.berkeley.edu/
+#
+# These use a simple API that allow us to control Pacman's interaction with
+# the environment adding a layer on top of the AI Berkeley code.
+#
+# As required by the licensing agreement for the PacMan AI we have:
+#
+# Licensing Information:  You are free to use or extend these projects for
+# educational purposes provided that (1) you do not distribute or publish
+# solutions, (2) you retain this notice, and (3) you provide clear
+# attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
+# 
+# Attribution Information: The Pacman AI projects were developed at UC Berkeley.
+# The core projects and autograders were primarily created by John DeNero
+# (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
+# Student side autograding was added by Brad Miller, Nick Hay, and
+# Pieter Abbeel (pabbeel@cs.berkeley.edu).
+
+# The agent here is was written by Simon Parsons, based on the code in
+# pacmanAgents.py
+
+from pacman import Directions
+from game import Agent
+import api
+import random
+import game
+import util
+
+class PartialAgent(Agent):
+
+    # Constructor: this gets run when we first invoke pacman.py
+    def __init__(self):
+        self.last = 0
+        self.reachedCorners=[None] * 4
+        self.lastMove = Directions.STOP
+    
+    # This is what gets run in between multiple games
+    def final(self, state):
+        self.last = 0
+        self.reachedCorners=[None] * 4
+        self.lastMove = Directions.STOP
+
+    # For now I just move randomly
+   # def getAction(self, state):
+        # Get the actions we can try, and remove "STOP" if that is one of them.
+     #   legal = api.legalActions(state)
+     #   if Directions.STOP in legal:
+      #      legal.remove(Directions.STOP)
+     #   # Random choice between the legal options.
+    #    return api.makeMove(random.choice(legal), legal)
+#
+      
+    def getAction(self, state):
+        # Get the actions we can try, and remove "STOP" if that is one of them.
+        legal = api.legalActions(state)
+        print("howdy!")
+        if Directions.STOP in legal:
+            legal.remove(Directions.STOP)
+        lm=self.lastMove
+        print ("last move was " + lm)
+        print ("legal options are:")
+        print(legal)
+        #if lm in legal:
+            #print("yall!")
+           # return api.makeMove(lm, legal)
+      #  else:
+        corners= api.corners(state);
+        print(corners)
+        currentpos=api.whereAmI(state)
+        
+        if self.last<len(corners):
+            cornerChosen = corners[self.last]
+        else:
+            self.last=0
+            cornerChosen = corners[0]
+            print(self.last)
+      #  print("cp: ")
+      #  print(currentpos)
+        print("cc: ")
+        print(cornerChosen)
+      #  print(currentpos==cornerChosen)
+       # print(1)
+        index=self.last
+        if currentpos==cornerChosen or ((currentpos[0]==(cornerChosen[0]+1)) and (currentpos[1]==(cornerChosen[1]+1))) or ((currentpos[0]==(cornerChosen[0]-1)) and (currentpos[1]==(cornerChosen[1]-1))) or ((currentpos[0]==(cornerChosen[0]+1)) and (currentpos[1]==(cornerChosen[1]-1))) or ((currentpos[0]==(cornerChosen[0]-1)) and (currentpos[1]==(cornerChosen[1]+1))) :
+            #print("hello there YOU")
+         #   print(index)
+            #print(" for real?")
+            self.reachedCorners[index]=cornerChosen
+            self.last=index+1
+            if self.last<len(corners):
+
+         #   print("new index:")
+                print(self.last)
+                cornerChosen = corners[self.last]
+            else:
+                self.last=0
+                cornerChosen = corners[0]
+                print(self.last)
+        #    print(2)
+
+
+        if (cornerChosen[0]<currentpos[0]): #x of corner is less than current x
+            if (lm!=Directions.EAST):
+                if Directions.WEST in legal:
+                  #  print("west. lm was "+lm)
+                    self.lastMove=Directions.WEST
+                    return api.makeMove(Directions.WEST, legal)
+            else:
+                legal.remove(Directions.WEST)
+
+        if (cornerChosen[0]>currentpos[0]):#x of corner is more than current x
+            if (lm!=Directions.WEST):
+                if Directions.EAST in legal:
+                  #  print("EAST. lm was "+lm)
+                    self.lastMove=Directions.EAST
+                    return api.makeMove(Directions.EAST, legal)
+            else:
+                legal.remove(Directions.EAST)
+
+        if (cornerChosen[1]<currentpos[1]):
+            if (lm!=Directions.NORTH):
+                if Directions.SOUTH in legal:
+                  #  print("south. lm was "+lm)
+                    self.lastMove=Directions.SOUTH
+                    return api.makeMove(Directions.SOUTH, legal)
+            else:
+                    legal.remove(Directions.SOUTH)
+                
+        if (cornerChosen[1]>currentpos[1]) and (lm!=Directions.SOUTH): #y of corner is more than currentY
+            if (lm!=Directions.SOUTH):
+                if Directions.NORTH in legal:
+                  #  print("NORTH. lm was "+lm)
+                    self.lastMove=Directions.NORTH
+                    return api.makeMove(Directions.NORTH, legal)
+            else:
+                    legal.remove(Directions.NORTH)
+
+        print(3);
+
+        # if not then Random choice between the legal options.
+   #     print("reached. gdi")
+   #     print(legal)
+   #     print(currentpos)
+   #     print("the corner chosen is ")
+   #     print(cornerChosen)
+    #    print("reached corners are:")
+   #     print(self.reachedCorners)
+        randomchoice=random.choice(legal)
+    #    print(randomchoice +" was random")
+        self.lastMove=randomchoice
+
+        return api.makeMove(randomchoice, legal)
+        
+   
